@@ -1,0 +1,49 @@
+{
+  "name": "my-react-flp-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.2",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "homepage": "./",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build && cp -r build/static webapp/react-app/static && cp build/index.html webapp/react-app/index.html && cp build/asset-manifest.json webapp/react-app/asset-manifest.json",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && fiori deploy --config ui5-deploy.yaml",
+    "undeploy": "npm run build && fiori undeploy --config ui5-deploy.yaml",
+    "deploy-test": "npm run build && fiori deploy --config ui5-deploy.yaml --testMode true"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@sap/ux-ui5-tooling": "^1.23.0",
+    "@ui5/cli": "^4.0.52",
+    "rimraf": "^5.0.5"
+  }
+}
