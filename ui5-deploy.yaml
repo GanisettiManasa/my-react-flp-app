@@ -4,16 +4,9 @@ specVersion: '3.0'
 metadata:
   name: com.yourcompany.myreactapp
 type: application
-framework:
-  name: SAPUI5
-  version: '1.120.0'
-  libraries:
-    - name: sap.m
-    - name: sap.ui.core
-    - name: themelib_sap_horizon
 resources:
   configuration:
-    paths:
+    p`  aths:
       webapp: webapp
 builder:
   resources:
@@ -24,6 +17,7 @@ builder:
     - name: deploy-to-abap
       afterTask: generateCachebusterInfo
       configuration:
+        verbose: true
         target:
           destination: S4H1
           url: http://202.153.35.211:50000/
@@ -33,7 +27,6 @@ builder:
           description: React App on Fiori Launchpad
           package: ZFTX
           transport: S4HK904966
-        safe: false
         exclude:
           - /test/
           - /react-app/static/media/

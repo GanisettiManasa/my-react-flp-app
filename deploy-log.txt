@@ -1,0 +1,76 @@
+
+> my-react-flp-app@0.1.0 deploy
+> npm run build && fiori deploy --config ui5-deploy.yaml
+
+
+> my-react-flp-app@0.1.0 build
+> react-scripts build && cp -r build/static webapp/react-app/static && cp build/index.html webapp/react-app/index.html && cp build/asset-manifest.json webapp/react-app/asset-manifest.json
+
+Creating an optimized production build...
+Compiled successfully.
+
+File sizes after gzip:
+
+  73.93 kB  build/static/js/main.79eb4a63.js
+
+The project was built assuming it is hosted at ./.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+
+[dotenv@17.3.1] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[?25l[2K[1G[36m?[39m [1mWarning: minUI5Version (1.108.0) is below the minimum (unknown) required by the app descriptor schema version 1.58.0 in the manifest.json file. The deployed app may not work correctly. Continue? (Y/n)?
+
+[22m [90m›[39m [90m(Y/n)[39m[2K[1G[2K[1G[32m✔[39m [1mWarning: minUI5Version (1.108.0) is below the minimum (unknown) required by the app descriptor schema version 1.58.0 in the manifest.json file. The deployed app may not work correctly. Continue? (Y/n)?
+
+[22m [90m…[39m yes
+[?25h
+Confirmation is required to deploy the app:
+
+    Application Name: ZREACTAPP
+    Package: ZFTX
+    Transport Request: S4HK904966
+    Destination: S4H1
+    SCP: false
+    
+    
+[?25l[2K[1G[36m?[39m [1mStart deployment (Y/n)?
+
+[22m [90m›[39m [90m(Y/n)[39m[2K[1G[2K[1G[32m✔[39m [1mStart deployment (Y/n)?
+
+[22m [90m…[39m yes
+[?25h◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+[32minfo[39m abap-deploy-task ZREACTAPP Creating archive with UI5 build result.
+[32minfo[39m abap-deploy-task ZREACTAPP Archive created.
+[32minfo[39m abap-deploy-task ZREACTAPP Starting to deploy.
+[32minfo[39m abap-deploy-task ZREACTAPP ZREACTAPP found on target system: true
+[32minfo[39m abap-deploy-task ZREACTAPP SAPUI5 Application ZREACTAPP has been uploaded and registered successfully
+[32minfo[39m abap-deploy-task ZREACTAPP ***** Upload of SAPUI5 App or Library from ZIP-Archive into SAPUI5 ABAP Repository *****
+[32minfo[39m abap-deploy-task ZREACTAPP Running in regular mode, brief log
+[32minfo[39m abap-deploy-task ZREACTAPP 15 Files found in Archive.
+[32minfo[39m abap-deploy-task ZREACTAPP * Parameters *
+[32minfo[39m abap-deploy-task ZREACTAPP A BAdI implementation for /UI5/BADI_REPOSITORY_LOAD is active: Operation parameters may have been adjusted.
+[32minfo[39m abap-deploy-task ZREACTAPP The name of the SAPUI5 repository "ZREACTAPP" has been determined from the corresponding import parameter.
+[32minfo[39m abap-deploy-task ZREACTAPP The binary files are identified using the standard settings.
+[32minfo[39m abap-deploy-task ZREACTAPP The text files are identified using the standard settings.
+[32minfo[39m abap-deploy-task ZREACTAPP The files and folders to be ignored are determined from the built-in standard settings.
+[32minfo[39m abap-deploy-task ZREACTAPP Transport Request "S4HK904966" has been determined from the corresponding import parameter.
+[32minfo[39m abap-deploy-task ZREACTAPP The external Code Page Name "UTF8" has been determined from the corresponding import parameter.
+[32minfo[39m abap-deploy-task ZREACTAPP The acceptance of Unix style end of line markers in text files has been determined from the corresponding import parameter.
+[32minfo[39m abap-deploy-task ZREACTAPP Unix style end of line markers in text files get accepted.
+[32minfo[39m abap-deploy-task ZREACTAPP The delta mode has been turned on.
+[32minfo[39m abap-deploy-task ZREACTAPP Running in safe mode
+[32minfo[39m abap-deploy-task ZREACTAPP Updating existing SAPUI5 ABAP repository ZREACTAPP
+[32minfo[39m abap-deploy-task ZREACTAPP * Updating the Application Index *
+[32minfo[39m abap-deploy-task ZREACTAPP Messages from its application log:
+[32minfo[39m abap-deploy-task ZREACTAPP Writing descriptor apps/com.yourcompany.myreactapp/app/sap/zreactapp/
+[32minfo[39m abap-deploy-task ZREACTAPP For details see the application log (SLG1) in client 000 for object /UI5/APPIDX .
+[32minfo[39m abap-deploy-task ZREACTAPP A BAdI implementation for /UI5/BADI_REPOSITORY_LOAD is active: Final activities may have been performed.
+[32minfo[39m abap-deploy-task ZREACTAPP SAPUI5 Application  has been uploaded and registered successfully
+[32minfo[39m abap-deploy-task ZREACTAPP * Done *
+[32minfo[39m abap-deploy-task ZREACTAPP App available at http://202.153.35.211:50000/sap/bc/ui5_ui5/sap/zreactapp
+[32minfo[39m abap-deploy-task ZREACTAPP Deployment Successful.
