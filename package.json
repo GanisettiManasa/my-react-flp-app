@@ -11,12 +11,13 @@
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "react-scripts": "5.0.1",
+    "recharts": "^3.8.1",
     "web-vitals": "^2.1.4"
   },
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rm -rf webapp/react-app/static && cp -r build/static webapp/react-app/static && cp build/index.html webapp/react-app/index.html && cp build/asset-manifest.json webapp/react-app/asset-manifest.json",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build && rm -rf webapp/react-app/static && cp -r build/static webapp/react-app/static && cp build/index.html webapp/react-app/index.html && cp build/asset-manifest.json webapp/react-app/asset-manifest.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "npm run build && rm -rf dist && cp -r webapp dist && fiori deploy --config ui5-deploy.yaml --verbose --yes",
