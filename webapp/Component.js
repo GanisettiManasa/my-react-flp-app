@@ -13,7 +13,7 @@ sap.ui.define(['sap/ui/core/UIComponent'], function (UIComponent) {
 
         createContent: function () {
             var oHTML = new sap.ui.core.HTML({
-                content: '<div id="react-root" style="height:100%;width:100%;margin:0;padding:0;position:absolute;top:0;left:0;right:0;bottom:0;background:#ffffff;"></div>',
+                content: '<div id="react-root" style="width:100%;margin:0;padding:0;position:absolute;top:0;left:0;right:0;bottom:0;background:#ffffff;overflow-y:auto;overflow-x:hidden;"></div>',
                 afterRendering: function () {
                     this._mountReactApp();
                 }.bind(this)
