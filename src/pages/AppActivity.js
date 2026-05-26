@@ -66,7 +66,7 @@ function UsersPopup({ appName, date, color, onClose }) {
           </div>
           <button onClick={onClose} style={{
             background: 'rgba(255,255,255,0.25)', border: 'none',
-            color: '#fff', width: '28px', height: '28px',
+            color: 'rgb(255, 255, 255)', width: '28px', height: '28px',
             borderRadius: '50%', cursor: 'pointer', fontSize: '14px'
           }}>✕</button>
         </div>
@@ -459,7 +459,24 @@ function AppActivity({ navigate }) {
         padding: '10px 20px', display: 'flex', alignItems: 'center',
         gap: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flexShrink: 0
       }}>
-        <button className="back-btn" onClick={() => navigate('home')}>← Back</button>
+        <button
+            onClick={() =>
+              navigate('home')
+            }
+            style={{
+              border: 'none',
+              background:
+                'linear-gradient(135deg,#0a6ed1,#0854a0)',
+              color: '#fff',
+              padding: '10px 18px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '13px',
+            }}
+          >
+            ← Back
+          </button>
         <div>
           <span style={{ fontWeight: 'bold', fontSize: '16px', color: '#0070f3' }}>App Activity</span>
           <span style={{ fontSize: '12px', color: '#999', marginLeft: '10px' }}>Application usage and launch statistics</span>

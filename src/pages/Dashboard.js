@@ -296,7 +296,7 @@ function Dashboard({ navigate }) {
             letterSpacing: '0.5px',
           }}
         >
-          SAP Analytics Dashboard
+          SAP Fiori Launchpad Tracker
         </div>
 
         <div
@@ -306,7 +306,7 @@ function Dashboard({ navigate }) {
             fontSize: '14px',
           }}
         >
-          Enterprise Reporting & Monitoring Center
+          Custom Analytics & Monitoring Framework
         </div>
       </div>
 

@@ -3,7 +3,7 @@
     "sap.app": {
         "id": "com.yourcompany.myreactapp",
         "type": "application",
-        "title": "My React App",
+        "title": "Fiori Tracker",
         "description": "React App on Fiori Launchpad",
         "applicationVersion": {
             "version": "1.0.0"

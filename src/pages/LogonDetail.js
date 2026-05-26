@@ -1,7 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const BASE =
   '/sap/opu/odata4/sap/zftx_analytics_srv/srvd/sap/zftx_analytics_srd/0001';
+
+const PAGE_SIZE = 500;
 
 const formatDateTime = (ts) => {
   if (!ts) return '-';
@@ -9,22 +15,35 @@ const formatDateTime = (ts) => {
   return new Date(ts).toLocaleString();
 };
 
-export default function LogonDetail({ navigate }) {
+export default function LogonDetail({
+  navigate,
+}) {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(false);
   const [error, setError] = useState('');
 
-  const [searchUser, setSearchUser] = useState('');
-  const [searchDate, setSearchDate] = useState('');
+  const [searchUser, setSearchUser] =
+    useState('');
+  const [searchDate, setSearchDate] =
+    useState('');
 
-  // API CALL
+  const [page, setPage] = useState(1);
+
+  // API CALL WITH PAGINATION
   useEffect(() => {
+    setLoading(true);
+
+    const skip = (page - 1) * PAGE_SIZE;
+
     fetch(
-      `${BASE}/ZFTX_C_LOGON_DETAIL`
+      `${BASE}/ZFTX_C_LOGON_DETAIL?$top=${PAGE_SIZE}&$skip=${skip}&sap-client=100`
     )
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
+          throw new Error(
+            `HTTP ${res.status}`
+          );
         }
 
         return res.json();
@@ -37,14 +56,16 @@ export default function LogonDetail({ navigate }) {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [page]);
 
   // FILTERING
   const filteredData = useMemo(() => {
     return data.filter((item) => {
       const userMatch = item.user_id
         ?.toLowerCase()
-        .includes(searchUser.toLowerCase());
+        .includes(
+          searchUser.toLowerCase()
+        );
 
       const dateMatch = searchDate
         ? item.event_date === searchDate
@@ -55,25 +76,36 @@ export default function LogonDetail({ navigate }) {
   }, [data, searchUser, searchDate]);
 
   // KPI DATA
-  const totalLogons = filteredData.length;
+  const totalLogons =
+    filteredData.length;
 
   const uniqueUsers = new Set(
-    filteredData.map((item) => item.user_id)
+    filteredData.map(
+      (item) => item.user_id
+    )
   ).size;
 
-  const desktopUsers = filteredData.filter(
-    (item) => item.device_type === 'Desktop'
-  ).length;
+  const desktopUsers =
+    filteredData.filter(
+      (item) =>
+        item.device_type ===
+        'Desktop'
+    ).length;
+
+  const browserCount = {};
+
+  filteredData.forEach((item) => {
+    browserCount[item.browser] =
+      (browserCount[item.browser] ||
+        0) + 1;
+  });
 
   const topBrowser =
-    [...filteredData].sort((a, b) => {
-      return (
-        filteredData.filter((x) => x.browser === b.browser)
-          .length -
-        filteredData.filter((x) => x.browser === a.browser)
-          .length
-      );
-    })[0]?.browser || '-';
+    Object.keys(browserCount).sort(
+      (a, b) =>
+        browserCount[b] -
+        browserCount[a]
+    )[0] || '-';
 
   // CARD STYLE
   const cardStyle = (bg) => ({
@@ -82,334 +114,360 @@ export default function LogonDetail({ navigate }) {
     borderRadius: '16px',
     padding: '20px',
     color: '#fff',
-    boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+    boxShadow:
+      '0 6px 18px rgba(0,0,0,0.12)',
+    minHeight: '140px',
   });
 
-  return (
+  return ( 
     <div
       style={{
-        background: '#eef2f7',
+        background: '#eef3f8',
         minHeight: '100vh',
         padding: '20px',
-        fontFamily: 'Arial',
+        fontFamily:
+          'Inter, Arial, sans-serif',
       }}
     >
+
       {/* HEADER */}
       <div
         style={{
-          background: '#fff',
-          borderRadius: '14px',
-          padding: '18px 22px',
+          background: '#ffffff',
+          borderRadius: '16px',
+          padding: '18px 24px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent:
+            'space-between',
           alignItems: 'center',
-          marginBottom: '18px',
-          boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+          marginBottom: '20px',
+          boxShadow:
+            '0 3px 12px rgba(0,0,0,0.08)',
         }}
       >
-        <div>
-          <div
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}
+        >
+          <button
+            onClick={() =>
+              navigate('home')
+            }
             style={{
-              fontSize: '28px',
-              fontWeight: 'bold',
-              color: '#1d3557',
-            }}
-          >
-            Logon Detail Analytics
-          </div>
-
-          <div
-            style={{
+              border: 'none',
+              background:
+                'linear-gradient(135deg,#0a6ed1,#0854a0)',
+              color: '#fff',
+              padding: '10px 18px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: '700',
               fontSize: '13px',
-              color: '#777',
-              marginTop: '4px',
             }}
           >
-            SAP User Login Activity Dashboard
+            ← Back
+          </button>
+
+          <div>
+            <div
+              style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                color: '#16324f',
+              }}
+            >
+              Logon Detail Analytics
+            </div>
+
+            <div
+              style={{
+                fontSize: '13px',
+                color: '#6b7280',
+                marginTop: '4px',
+              }}
+            >
+              SAP User Login Activity
+              Dashboard
+            </div>
           </div>
         </div>
 
-        <button
-          onClick={() => navigate('home')}
-          style={{
-            border: 'none',
-            background: '#0a6ed1',
-            color: '#fff',
-            padding: '10px 18px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-          }}
-        >
-          ← Back
-        </button>
       </div>
+     
 
       {/* KPI CARDS */}
-<div
-  style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '18px',
-    marginBottom: '22px',
-  }}
->
-  {/* TOTAL LOGONS */}
-  <div
-    style={cardStyle(
-      'linear-gradient(135deg,#16324f,#1f4e79)'
-    )}
-  >
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-      }}
-    >
-      <div>
-        <div
-          style={{
-            fontSize: '11px',
-            letterSpacing: '1px',
-            opacity: 0.85,
-            fontWeight: '600',
-          }}
-        >
-          TOTAL LOGONS
-        </div>
-
-        <div
-          style={{
-            fontSize: '36px',
-            fontWeight: '700',
-            marginTop: '12px',
-            lineHeight: 1,
-          }}
-        >
-          {totalLogons}
-        </div>
-      </div>
-
       <div
         style={{
-          width: '54px',
-          height: '54px',
-          borderRadius: '14px',
-          background: 'rgba(255,255,255,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '26px',
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(4, 1fr)',
+          gap: '18px',
+          marginBottom: '22px',
         }}
       >
-        🔐
-      </div>
-    </div>
-
-    <div
-      style={{
-        marginTop: '14px',
-        fontSize: '12px',
-        opacity: 0.75,
-      }}
-    >
-      System access events
-    </div>
-  </div>
-
-  {/* UNIQUE USERS */}
-  <div
-    style={cardStyle(
-      'linear-gradient(135deg,#0b5345,#117864)'
-    )}
-  >
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-      }}
-    >
-      <div>
+        {/* TOTAL LOGONS */}
         <div
-          style={{
-            fontSize: '11px',
-            letterSpacing: '1px',
-            opacity: 0.85,
-            fontWeight: '600',
-          }}
+          style={cardStyle(
+            'linear-gradient(135deg,#16324f,#1f4e79)'
+          )}
         >
-          UNIQUE USERS
+          <div
+            style={{
+              display: 'flex',
+              justifyContent:
+                'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '1px',
+                  opacity: 0.85,
+                  fontWeight: '600',
+                }}
+              >
+                TOTAL LOGONS
+              </div>
+
+              <div
+                style={{
+                  fontSize: '38px',
+                  fontWeight: '700',
+                  marginTop: '14px',
+                }}
+              >
+                {totalLogons}
+              </div>
+            </div>
+
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background:
+                  'rgba(255,255,255,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent:
+                  'center',
+                fontSize: '28px',
+              }}
+            >
+              🔐
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: '16px',
+              fontSize: '12px',
+              opacity: 0.8,
+            }}
+          >
+            System access events
+          </div>
         </div>
 
+        {/* UNIQUE USERS */}
         <div
-          style={{
-            fontSize: '36px',
-            fontWeight: '700',
-            marginTop: '12px',
-            lineHeight: 1,
-          }}
+          style={cardStyle(
+            'linear-gradient(135deg,#0b5345,#117864)'
+          )}
         >
-          {uniqueUsers}
-        </div>
-      </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent:
+                'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '1px',
+                  opacity: 0.85,
+                  fontWeight: '600',
+                }}
+              >
+                UNIQUE USERS
+              </div>
 
-      <div
-        style={{
-          width: '54px',
-          height: '54px',
-          borderRadius: '14px',
-          background: 'rgba(255,255,255,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '26px',
-        }}
-      >
-        👥
-      </div>
-    </div>
+              <div
+                style={{
+                  fontSize: '38px',
+                  fontWeight: '700',
+                  marginTop: '14px',
+                }}
+              >
+                {uniqueUsers}
+              </div>
+            </div>
 
-    <div
-      style={{
-        marginTop: '14px',
-        fontSize: '12px',
-        opacity: 0.75,
-      }}
-    >
-      Active SAP users
-    </div>
-  </div>
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background:
+                  'rgba(255,255,255,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent:
+                  'center',
+                fontSize: '28px',
+              }}
+            >
+              👥
+            </div>
+          </div>
 
-  {/* DESKTOP USERS */}
-  <div
-    style={cardStyle(
-      'linear-gradient(135deg,#5b2c6f,#7d3c98)'
-    )}
-  >
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-      }}
-    >
-      <div>
-        <div
-          style={{
-            fontSize: '11px',
-            letterSpacing: '1px',
-            opacity: 0.85,
-            fontWeight: '600',
-          }}
-        >
-          DESKTOP LOGINS
-        </div>
-
-        <div
-          style={{
-            fontSize: '36px',
-            fontWeight: '700',
-            marginTop: '12px',
-            lineHeight: 1,
-          }}
-        >
-          {desktopUsers}
-        </div>
-      </div>
-
-      <div
-        style={{
-          width: '54px',
-          height: '54px',
-          borderRadius: '14px',
-          background: 'rgba(255,255,255,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '26px',
-        }}
-      >
-        🖥️
-      </div>
-    </div>
-
-    <div
-      style={{
-        marginTop: '14px',
-        fontSize: '12px',
-        opacity: 0.75,
-      }}
-    >
-      Desktop device sessions
-    </div>
-  </div>
-
-  {/* TOP BROWSER */}
-  <div
-    style={cardStyle(
-      'linear-gradient(135deg,#7e5109,#b9770e)'
-    )}
-  >
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-      }}
-    >
-      <div>
-        <div
-          style={{
-            fontSize: '11px',
-            letterSpacing: '1px',
-            opacity: 0.85,
-            fontWeight: '600',
-          }}
-        >
-          TOP BROWSER
+          <div
+            style={{
+              marginTop: '16px',
+              fontSize: '12px',
+              opacity: 0.8,
+            }}
+          >
+            Active SAP users
+          </div>
         </div>
 
+        {/* DESKTOP */}
         <div
-          style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            marginTop: '14px',
-            lineHeight: 1.2,
-          }}
+          style={cardStyle(
+            'linear-gradient(135deg,#5b2c6f,#7d3c98)'
+          )}
         >
-          {topBrowser}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent:
+                'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '1px',
+                  opacity: 0.85,
+                  fontWeight: '600',
+                }}
+              >
+                DESKTOP LOGINS
+              </div>
+
+              <div
+                style={{
+                  fontSize: '38px',
+                  fontWeight: '700',
+                  marginTop: '14px',
+                }}
+              >
+                {desktopUsers}
+              </div>
+            </div>
+
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background:
+                  'rgba(255,255,255,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent:
+                  'center',
+                fontSize: '28px',
+              }}
+            >
+              🖥️
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: '16px',
+              fontSize: '12px',
+              opacity: 0.8,
+            }}
+          >
+            Desktop sessions
+          </div>
+        </div>
+
+        {/* TOP BROWSER */}
+        <div
+          style={cardStyle(
+            'linear-gradient(135deg,#7e5109,#b9770e)'
+          )}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent:
+                'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '1px',
+                  opacity: 0.85,
+                  fontWeight: '600',
+                }}
+              >
+                TOP BROWSER
+              </div>
+
+              <div
+                style={{
+                  fontSize: '28px',
+                  fontWeight: '700',
+                  marginTop: '16px',
+                }}
+              >
+                {topBrowser}
+              </div>
+            </div>
+
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background:
+                  'rgba(255,255,255,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent:
+                  'center',
+                fontSize: '28px',
+              }}
+            >
+              🌐
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: '16px',
+              fontSize: '12px',
+              opacity: 0.8,
+            }}
+          >
+            Most used browser
+          </div>
         </div>
       </div>
-
-      <div
-        style={{
-          width: '54px',
-          height: '54px',
-          borderRadius: '14px',
-          background: 'rgba(255,255,255,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '26px',
-        }}
-      >
-        🌐
-      </div>
-    </div>
-
-    <div
-      style={{
-        marginTop: '14px',
-        fontSize: '12px',
-        opacity: 0.75,
-      }}
-    >
-      Most used browser
-    </div>
-  </div>
-</div>
 
       {/* FILTERS */}
       <div
@@ -421,7 +479,8 @@ export default function LogonDetail({ navigate }) {
           display: 'flex',
           gap: '14px',
           alignItems: 'flex-end',
-          boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+          boxShadow:
+            '0 3px 10px rgba(0,0,0,0.08)',
         }}
       >
         {/* USER */}
@@ -431,7 +490,7 @@ export default function LogonDetail({ navigate }) {
               display: 'block',
               marginBottom: '6px',
               fontSize: '12px',
-              fontWeight: 'bold',
+              fontWeight: '700',
               color: '#555',
             }}
           >
@@ -441,13 +500,18 @@ export default function LogonDetail({ navigate }) {
           <input
             type="text"
             value={searchUser}
-            onChange={(e) => setSearchUser(e.target.value)}
+            onChange={(e) =>
+              setSearchUser(
+                e.target.value
+              )
+            }
             placeholder="Search User..."
             style={{
               width: '240px',
               padding: '10px 12px',
               borderRadius: '8px',
-              border: '1px solid #d0d7de',
+              border:
+                '1px solid #d0d7de',
               outline: 'none',
             }}
           />
@@ -460,7 +524,7 @@ export default function LogonDetail({ navigate }) {
               display: 'block',
               marginBottom: '6px',
               fontSize: '12px',
-              fontWeight: 'bold',
+              fontWeight: '700',
               color: '#555',
             }}
           >
@@ -470,12 +534,17 @@ export default function LogonDetail({ navigate }) {
           <input
             type="date"
             value={searchDate}
-            onChange={(e) => setSearchDate(e.target.value)}
+            onChange={(e) =>
+              setSearchDate(
+                e.target.value
+              )
+            }
             style={{
               width: '200px',
               padding: '10px 12px',
               borderRadius: '8px',
-              border: '1px solid #d0d7de',
+              border:
+                '1px solid #d0d7de',
               outline: 'none',
             }}
           />
@@ -491,9 +560,11 @@ export default function LogonDetail({ navigate }) {
             padding: '10px 16px',
             border: 'none',
             borderRadius: '8px',
-            background: '#f1f3f5',
+            background:
+              'linear-gradient(135deg,#334155,#1e293b)',
+            color: '#fff',
             cursor: 'pointer',
-            fontWeight: 'bold',
+            fontWeight: '700',
           }}
         >
           Clear
@@ -504,74 +575,143 @@ export default function LogonDetail({ navigate }) {
       <div
         style={{
           background: '#fff',
-          borderRadius: '14px',
+          borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+          boxShadow:
+            '0 3px 10px rgba(0,0,0,0.08)',
         }}
       >
-        {/* HEADER */}
+        {/* TABLE HEADER */}
         <div
           style={{
             background:
-              'linear-gradient(90deg,#1d3557,#274c77)',
+              'linear-gradient(90deg,#16324f,#274c77)',
             color: '#fff',
             padding: '16px 20px',
-            fontWeight: 'bold',
+            fontWeight: '700',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent:
+              'space-between',
+            alignItems: 'center',
           }}
         >
-          <span>Logon Details</span>
+          <span>
+            Logon Details
+          </span>
 
-          <span
+          {/* PAGINATION */}
+          <div
             style={{
-              background: 'rgba(255,255,255,0.15)',
-              padding: '4px 12px',
-              borderRadius: '20px',
-              fontSize: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
             }}
           >
-            {filteredData.length} Records
-          </span>
+            <button
+              disabled={page === 1}
+              onClick={() =>
+                setPage((p) => p - 1)
+              }
+              style={{
+                border: 'none',
+                padding:
+                  '7px 14px',
+                borderRadius: '8px',
+                cursor:
+                  page === 1
+                    ? 'not-allowed'
+                    : 'pointer',
+                background:
+                  page === 1
+                    ? '#94a3b8'
+                    : '#ffffff',
+                color:
+                  page === 1
+                    ? '#fff'
+                    : '#16324f',
+                fontWeight: '700',
+              }}
+            >
+              Prev
+            </button>
+
+            <div
+              style={{
+                fontSize: '13px',
+                fontWeight: '700',
+              }}
+            >
+              Page {page}
+            </div>
+
+            <button
+              onClick={() =>
+                setPage((p) => p + 1)
+              }
+              style={{
+                border: 'none',
+                padding:
+                  '7px 14px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                background: '#ffffff',
+                color: '#16324f',
+                fontWeight: '700',
+              }}
+            >
+              Next
+            </button>
+          </div>
         </div>
 
-        {loading && (
-          <div
-            style={{
-              padding: '50px',
-              textAlign: 'center',
-              color: '#777',
-            }}
-          >
-            Loading data...
-          </div>
-        )}
-
-        {error && (
-          <div
-            style={{
-              padding: '20px',
-              color: '#c0392b',
-              fontWeight: 'bold',
-            }}
-          >
-            Error: {error}
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div style={{ overflowX: 'auto' }}>
+        {/* TABLE BODY */}
+        <div
+          style={{
+            maxHeight: '620px',
+            overflowY: 'auto',
+            overflowX: 'auto',
+          }}
+        >
+          {loading ? (
+            <div
+              style={{
+                padding: '60px',
+                textAlign: 'center',
+                color: '#64748b',
+              }}
+            >
+              Loading data...
+            </div>
+          ) : error ? (
+            <div
+              style={{
+                padding: '30px',
+                color: '#dc2626',
+                fontWeight: '700',
+              }}
+            >
+              Error: {error}
+            </div>
+          ) : (
             <table
               style={{
                 width: '100%',
-                borderCollapse: 'collapse',
+                borderCollapse:
+                  'collapse',
                 fontSize: '13px',
               }}
             >
-              <thead>
+              <thead
+                style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 5,
+                }}
+              >
                 <tr
                   style={{
-                    background: '#edf4ff',
+                    background:
+                      '#edf4ff',
                   }}
                 >
                   {[
@@ -586,12 +726,18 @@ export default function LogonDetail({ navigate }) {
                     <th
                       key={head}
                       style={{
-                        padding: '14px',
-                        textAlign: 'left',
-                        color: '#1d3557',
-                        fontWeight: 'bold',
+                        padding:
+                          '14px',
+                        textAlign:
+                          'left',
+                        color:
+                          '#16324f',
+                        fontWeight:
+                          '700',
                         borderBottom:
-                          '2px solid #dbe7ff',
+                          '1px solid #dbe7ff',
+                        whiteSpace:
+                          'nowrap',
                       }}
                     >
                       {head}
@@ -601,154 +747,239 @@ export default function LogonDetail({ navigate }) {
               </thead>
 
               <tbody>
-                {filteredData.length === 0 ? (
+                {filteredData.length ===
+                0 ? (
                   <tr>
                     <td
                       colSpan="7"
                       style={{
-                        padding: '40px',
-                        textAlign: 'center',
-                        color: '#888',
+                        padding:
+                          '50px',
+                        textAlign:
+                          'center',
+                        color:
+                          '#64748b',
                       }}
                     >
                       No records found
                     </td>
                   </tr>
                 ) : (
-                  filteredData.map((item, index) => (
-                    <tr
-                      key={index}
-                      style={{
-                        background:
-                          index % 2 === 0
-                            ? '#fff'
-                            : '#fafcff',
-                        borderBottom:
-                          '1px solid #f0f0f0',
-                      }}
-                    >
-                      {/* USER */}
-                      <td style={{ padding: '14px' }}>
-                        <div
+                  filteredData.map(
+                    (
+                      item,
+                      index
+                    ) => (
+                      <tr
+                        key={
+                          index
+                        }
+                        style={{
+                          background:
+                            index %
+                              2 ===
+                            0
+                              ? '#fff'
+                              : '#f8fbff',
+                          borderBottom:
+                            '1px solid #eef2f7',
+                        }}
+                      >
+                        {/* USER */}
+                        <td
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
+                            padding:
+                              '14px',
                           }}
                         >
                           <div
                             style={{
-                              width: '38px',
-                              height: '38px',
-                              borderRadius: '50%',
-                              background:
-                                'linear-gradient(135deg,#0a6ed1,#0854a0)',
-                              color: '#fff',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontWeight: 'bold',
+                              display:
+                                'flex',
+                              alignItems:
+                                'center',
+                              gap: '12px',
                             }}
                           >
-                            {item.user_id?.slice(0, 2)}
-                          </div>
-
-                          <div>
                             <div
                               style={{
-                                fontWeight: 'bold',
-                                color: '#1d3557',
+                                width:
+                                  '40px',
+                                height:
+                                  '40px',
+                                borderRadius:
+                                  '50%',
+                                background:
+                                  'linear-gradient(135deg,#0a6ed1,#0854a0)',
+                                color:
+                                  '#fff',
+                                display:
+                                  'flex',
+                                alignItems:
+                                  'center',
+                                justifyContent:
+                                  'center',
+                                fontWeight:
+                                  '700',
                               }}
                             >
-                              {item.user_id}
+                              {item.user_id?.slice(
+                                0,
+                                2
+                              )}
                             </div>
 
-                            <div
-                              style={{
-                                fontSize: '11px',
-                                color: '#777',
-                              }}
-                            >
-                              SAP User
+                            <div>
+                              <div
+                                style={{
+                                  fontWeight:
+                                    '700',
+                                  color:
+                                    '#16324f',
+                                }}
+                              >
+                                {
+                                  item.user_id
+                                }
+                              </div>
+
+                              {/* <div
+                                style={{
+                                  fontSize:
+                                    '11px',
+                                  color:
+                                    '#64748b',
+                                }}
+                              >
+                                SAP User
+                              </div> */}
                             </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* BROWSER */}
-                      <td style={{ padding: '14px' }}>
-                        {item.browser}
-                      </td>
-
-                      {/* DEVICE */}
-                      <td style={{ padding: '14px' }}>
-                        <span
+                        {/* BROWSER */}
+                        <td
                           style={{
-                            background:
-                              item.device_type ===
-                              'Desktop'
-                                ? '#e8f5e9'
-                                : '#fff3e0',
+                            padding:
+                              '14px',
+                          }}
+                        >
+                          {
+                            item.browser
+                          }
+                        </td>
 
+                        {/* DEVICE */}
+                        <td
+                          style={{
+                            padding:
+                              '14px',
+                          }}
+                        >
+                          <span
+                            style={{
+                              background:
+                                item.device_type ===
+                                'Desktop'
+                                  ? '#dcfce7'
+                                  : '#fff7ed',
+                              color:
+                                item.device_type ===
+                                'Desktop'
+                                  ? '#166534'
+                                  : '#ea580c',
+                              padding:
+                                '5px 12px',
+                              borderRadius:
+                                '20px',
+                              fontSize:
+                                '11px',
+                              fontWeight:
+                                '700',
+                            }}
+                          >
+                            {
+                              item.device_type
+                            }
+                          </span>
+                        </td>
+
+                        {/* SYSTEM */}
+                        <td
+                          style={{
+                            padding:
+                              '14px',
+                          }}
+                        >
+                          <span
+                            style={{
+                              background:
+                                '#dbeafe',
+                              color:
+                                '#1d4ed8',
+                              padding:
+                                '5px 12px',
+                              borderRadius:
+                                '20px',
+                              fontSize:
+                                '11px',
+                              fontWeight:
+                                '700',
+                            }}
+                          >
+                            {
+                              item.system_id
+                            }
+                          </span>
+                        </td>
+
+                        {/* DATE */}
+                        <td
+                          style={{
+                            padding:
+                              '14px',
+                          }}
+                        >
+                          {
+                            item.event_date
+                          }
+                        </td>
+
+                        {/* TIME */}
+                        <td
+                          style={{
+                            padding:
+                              '14px',
+                          }}
+                        >
+                          {formatDateTime(
+                            item.event_ts
+                          )}
+                        </td>
+
+                        {/* SESSION */}
+                        <td
+                          style={{
+                            padding:
+                              '14px',
+                            fontFamily:
+                              'monospace',
                             color:
-                              item.device_type ===
-                              'Desktop'
-                                ? '#2e7d32'
-                                : '#ef6c00',
-
-                            padding: '5px 10px',
-                            borderRadius: '20px',
-                            fontSize: '11px',
-                            fontWeight: 'bold',
+                              '#475569',
                           }}
                         >
-                          {item.device_type}
-                        </span>
-                      </td>
-
-                      {/* SYSTEM */}
-                      <td style={{ padding: '14px' }}>
-                        <span
-                          style={{
-                            background: '#e3f2fd',
-                            color: '#1565c0',
-                            padding: '5px 10px',
-                            borderRadius: '20px',
-                            fontSize: '11px',
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          {item.system_id}
-                        </span>
-                      </td>
-
-                      {/* DATE */}
-                      <td style={{ padding: '14px' }}>
-                        {item.event_date}
-                      </td>
-
-                      {/* TIME */}
-                      <td style={{ padding: '14px' }}>
-                        {formatDateTime(item.event_ts)}
-                      </td>
-
-                      {/* SESSION */}
-                      <td
-                        style={{
-                          padding: '14px',
-                          fontFamily: 'monospace',
-                          color: '#555',
-                        }}
-                      >
-                        {item.session_id}
-                      </td>
-                    </tr>
-                  ))
+                          {
+                            item.session_id
+                          }
+                        </td>
+                      </tr>
+                    )
+                  )
                 )}
               </tbody>
             </table>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

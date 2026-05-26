@@ -113,55 +113,71 @@ export default function UserActivity({ navigate }) {
     >
       {/* HEADER */}
       <div
+  style={{
+    background: '#fff',
+    borderRadius: '14px',
+    padding: '18px 22px',
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '18px',
+    boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+  }}
+>
+  {/* LEFT SECTION */}
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px',
+    }}
+  >
+    {/* BACK BUTTON */}
+    <button
+            onClick={() =>
+              navigate('home')
+            }
+            style={{
+              border: 'none',
+              background:
+                'linear-gradient(135deg,#0a6ed1,#0854a0)',
+              color: '#fff',
+              padding: '10px 18px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '13px',
+            }}
+          >
+            ← Back
+          </button>
+
+    {/* HEADING */}
+    <div>
+      <div
         style={{
-          background: '#fff',
-          borderRadius: '14px',
-          padding: '18px 22px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '18px',
-          boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+          fontSize: '28px',
+          fontWeight: 'bold',
+          color: '#1d3557',
         }}
       >
-        <div>
-          <div
-            style={{
-              fontSize: '28px',
-              fontWeight: 'bold',
-              color: '#1d3557',
-            }}
-          >
-            User Activity Analytics
-          </div>
-
-          {/* <div
-            style={{
-              fontSize: '13px',
-              color: '#777',
-              marginTop: '4px',
-            }}
-          >
-            SAP Fiori User Usage Dashboard
-          </div> */}
-        </div>
-
-        <button
-          onClick={() => navigate('home')}
-          style={{
-            border: 'none',
-            background: '#0070f3',
-            color: '#fff',
-            padding: '10px 18px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '13px',
-          }}
-        >
-          ← Back
-        </button>
+        User Activity Analysis
       </div>
+
+      {/* SUBTITLE */}
+      {/* 
+      <div
+        style={{
+          fontSize: '13px',
+          color: '#777',
+          marginTop: '4px',
+        }}
+      >
+        SAP Fiori User Usage Dashboard
+      </div> 
+      */}
+    </div>
+  </div>
+</div>
 
       {/* KPI CARDS */}
     <div
@@ -699,7 +715,7 @@ export default function UserActivity({ navigate }) {
                               {item.user_id}
                             </div>
 
-                            <div
+                            {/* <div
                               style={{
                                 fontSize: '11px',
                                 color: '#777',
@@ -707,7 +723,7 @@ export default function UserActivity({ navigate }) {
                               }}
                             >
                               {item.department || 'SAP User'}
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </td>

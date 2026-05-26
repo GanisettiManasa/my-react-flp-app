@@ -237,7 +237,25 @@ function DashboardData({ navigate }) {
 
       {/* Header */}
       <div style={{ background: '#fff', borderLeft: '4px solid #00a36c', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flexShrink: 0 }}>
-        <button className="back-btn" onClick={() => navigate('home')}>← Back</button>
+        {/* <button className="back-btn" onClick={() => navigate('home')}>← Back</button> */}
+        <button
+            onClick={() =>
+              navigate('home')
+            }
+            style={{
+              border: 'none',
+              background:
+                'linear-gradient(135deg,#0a6ed1,#0854a0)',
+              color: '#fff',
+              padding: '10px 18px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '13px',
+            }}
+          >
+            ← Back
+          </button>
         <div>
           <span style={{ fontWeight: 'bold', fontSize: '16px', color: '#00a36c' }}>Dashboard</span>
           <span style={{ fontSize: '12px', color: '#999', marginLeft: '10px' }}>Daily active users and app usage overview</span>
