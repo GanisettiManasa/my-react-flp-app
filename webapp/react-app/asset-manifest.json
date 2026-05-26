@@ -1,19 +1,11 @@
 {
   "files": {
     "main.css": "./static/css/main.f1276497.css",
-<<<<<<< Updated upstream
-    "main.js": "./static/js/main.f185cb7d.js",
-=======
-    "main.js": "./static/js/main.03dc70d9.js",
->>>>>>> Stashed changes
+    "main.js": "./static/js/main.04fddb5a.js",
     "index.html": "./index.html"
   },
   "entrypoints": [
     "static/css/main.f1276497.css",
-<<<<<<< Updated upstream
-    "static/js/main.f185cb7d.js"
-=======
-    "static/js/main.03dc70d9.js"
->>>>>>> Stashed changes
+    "static/js/main.04fddb5a.js"
   ]
 }

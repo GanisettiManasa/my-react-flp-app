@@ -20,7 +20,7 @@ export default function LogonDetail({ navigate }) {
   // API CALL
   useEffect(() => {
     fetch(
-      `${BASE}/ZFTX_C_LOGON_DETAIL?$top=100&sap-client=100`
+      `${BASE}/ZFTX_C_LOGON_DETAIL`
     )
       .then((res) => {
         if (!res.ok) {
