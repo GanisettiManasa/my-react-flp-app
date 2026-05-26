@@ -17,7 +17,15 @@ const fmt = (ts) => {
 };
 
 // ── Modal ────────────────────────────────────────────
-function Modal({ title, color, rows, onClose }) {
+function Modal({ title, color, rows, type, loading, onClose }) {
+
+  const fmtTs = (ts) => {
+    if (!ts) return '-';
+    const s = Math.floor(ts).toString();
+    if (s.length < 14) return s;
+    return `${s.slice(6,8)}/${s.slice(4,6)}/${s.slice(0,4)}`;
+  };
+
   return (
     <div style={{
       position: 'fixed', inset: 0,
@@ -30,6 +38,8 @@ function Modal({ title, color, rows, onClose }) {
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
       }}>
+
+        {/* Header */}
         <div style={{
           background: color, padding: '14px 20px',
           borderRadius: '12px 12px 0 0',
@@ -42,45 +52,90 @@ function Modal({ title, color, rows, onClose }) {
             borderRadius: '50%', cursor: 'pointer', fontSize: '14px'
           }}>✕</button>
         </div>
+
+        {/* Body */}
         <div style={{ overflow: 'auto', flex: 1 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-            <thead style={{ position: 'sticky', top: 0 }}>
-              <tr style={{ background: '#f5f5f5' }}>
-                {['App ID','System','Launches','Users','Last Accessed'].map(col => (
-                  <th key={col} style={{
-                    padding: '10px 14px',
-                    textAlign: col === 'Launches' || col === 'Users' ? 'right' : 'left',
-                    color: color, fontWeight: '700', fontSize: '12px',
-                    borderBottom: `2px solid ${color}`
-                  }}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa', borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '8px 14px' }}>
-                    <span style={{ background: '#e8f0fe', color: '#0070f3', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>
-                      {r.app_id || '-'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '8px 14px' }}>
-                    <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
-                      {r.system_id}
-                    </span>
-                  </td>
-                  <td style={{ padding: '8px 14px', textAlign: 'right', fontWeight: 'bold', color: '#e74c3c' }}>{r.total_launches?.toLocaleString()}</td>
-                  <td style={{ padding: '8px 14px', textAlign: 'right', color: '#8e44ad', fontWeight: 'bold' }}>{r.unique_users}</td>
-                  <td style={{ padding: '8px 14px', fontSize: '12px', color: '#666' }}>{fmt(r.last_used_ts)}</td>
+          {loading ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>
+              Loading...
+            </div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <thead style={{ position: 'sticky', top: 0 }}>
+                <tr style={{ background: '#f5f5f5' }}>
+                  {type === 'users'
+                    ? ['User ID','System','Total Launches','Unique Apps','Last Activity','First Activity'].map(col => (
+                        <th key={col} style={{
+                          padding: '10px 14px',
+                          textAlign: ['Total Launches','Unique Apps'].includes(col) ? 'right' : 'left',
+                          color: color, fontWeight: '700', fontSize: '12px',
+                          borderBottom: `2px solid ${color}`
+                        }}>{col}</th>
+                      ))
+                    : ['App ID','System','Launches','Users','Last Accessed'].map(col => (
+                        <th key={col} style={{
+                          padding: '10px 14px',
+                          textAlign: ['Launches','Users'].includes(col) ? 'right' : 'left',
+                          color: color, fontWeight: '700', fontSize: '12px',
+                          borderBottom: `2px solid ${color}`
+                        }}>{col}</th>
+                      ))
+                  }
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.length === 0
+                  ? <tr><td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>No records found</td></tr>
+                  : rows.map((r, i) => (
+                    <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa', borderBottom: '1px solid #eee' }}>
+                      {type === 'users' ? (
+                        <>
+                          <td style={{ padding: '8px 14px' }}>
+                            <span style={{ background: '#f5eef8', color: '#8e44ad', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>
+                              {r.user_id || '-'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 14px' }}>
+                            <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
+                              {r.system_id}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 14px', textAlign: 'right', fontWeight: 'bold', color: '#e74c3c' }}>{r.total_launches?.toLocaleString()}</td>
+                          <td style={{ padding: '8px 14px', textAlign: 'right', color: '#0070f3', fontWeight: 'bold' }}>{r.unique_apps_used}</td>
+                          <td style={{ padding: '8px 14px', fontSize: '12px', color: '#666' }}>{fmtTs(r.last_activity_ts)}</td>
+                          <td style={{ padding: '8px 14px', fontSize: '12px', color: '#666' }}>{r.first_activity_date}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td style={{ padding: '8px 14px' }}>
+                            <span style={{ background: '#e8f0fe', color: '#0070f3', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>
+                              {r.app_id || '-'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 14px' }}>
+                            <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
+                              {r.system_id}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 14px', textAlign: 'right', fontWeight: 'bold', color: '#e74c3c' }}>{r.total_launches?.toLocaleString()}</td>
+                          <td style={{ padding: '8px 14px', textAlign: 'right', color: '#8e44ad', fontWeight: 'bold' }}>{r.unique_users}</td>
+                          <td style={{ padding: '8px 14px', fontSize: '12px', color: '#666' }}>{fmt(r.last_used_ts)}</td>
+                        </>
+                      )}
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          )}
         </div>
+
+        {/* Footer */}
         <div style={{ padding: '12px 20px', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '13px', color: '#777' }}>{rows.length} records</span>
           <button onClick={onClose} style={{ padding: '7px 20px', background: color, color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}>Close</button>
         </div>
+
       </div>
     </div>
   );
@@ -240,12 +295,28 @@ function AppActivity({ navigate }) {
   const chartData     = filtered.map(r => ({ name: r.app_id||'Unknown', value: r.total_launches||0 }));
 
   const openModal = (type) => {
-    const configs = {
-      apps:     { title: `All Apps (${totalApps})`,                          color: '#0070f3', rows: [...filtered] },
-      launches: { title: `By Total Launches (${totalLaunches.toLocaleString()})`, color: '#00a36c', rows: [...filtered].sort((a,b) => (b.total_launches||0)-(a.total_launches||0)) },
-      users:    { title: `By Unique Users (${totalUsers.toLocaleString()})`,  color: '#8e44ad', rows: [...filtered].sort((a,b) => (b.unique_users||0)-(a.unique_users||0)) }
-    };
-    setModal(configs[type]);
+    if (type === 'apps') {
+      setModal({ title: `All Apps (${totalApps})`, color: '#0070f3', rows: [...filtered], type: 'apps' });
+    } else if (type === 'launches') {
+      setModal({
+        title: `By Total Launches (${totalLaunches.toLocaleString()})`,
+        color: '#00a36c',
+        rows: [...filtered].sort((a, b) => (b.total_launches || 0) - (a.total_launches || 0)),
+        type: 'launches'
+      });
+    } else if (type === 'users') {
+      setModal({ title: 'Loading Users...', color: '#8e44ad', rows: [], type: 'users', loading: true });
+      fetch(`${BASE}/ZFTX_C_USER_ACTIVITY?sap-client=100&$orderby=total_launches desc`)
+        .then(r => r.json())
+        .then(j => setModal({
+          title: `Unique Users (${j.value?.length || 0})`,
+          color: '#8e44ad',
+          rows: j.value || [],
+          type: 'users',
+          loading: false
+        }))
+        .catch(() => setModal({ title: 'Unique Users', color: '#8e44ad', rows: [], type: 'users', loading: false }));
+    }
   };
 
   const inputStyle = { padding: '5px 10px', fontSize: '12px', border: '1px solid #ddd', borderRadius: '4px', outline: 'none' };
@@ -253,7 +324,16 @@ function AppActivity({ navigate }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f0f2f5', overflow: 'hidden' }}>
 
-      {modal && <Modal title={modal.title} color={modal.color} rows={modal.rows} onClose={() => setModal(null)} />}
+      {modal && (
+  <Modal
+    title={modal.title}
+    color={modal.color}
+    rows={modal.rows}
+    type={modal.type}
+    loading={modal.loading}
+    onClose={() => setModal(null)}
+  />
+)}
 
       {/* ── Top Bar ── */}
       <div style={{
